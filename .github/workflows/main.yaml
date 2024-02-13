@@ -29,7 +29,7 @@ jobs:
       env:
         RABBIT_PASSWORD : ${{secrets.RABBIT_PASSWORD}}
         ONPREM_REDIS : ${{secrets.ONPREM_REDIS}}
-        COUCHBASE_PASSWORD : $${{secrets.COUCHBASE_PASSWORD}}
+        COUCHBASE_PASSWORD : ${{secrets.COUCHBASE_PASSWORD}}
      - 
       name: Replace Appsettings
       run: cp ${{env.REPLACESETTINGS}} ${{env.APPSETTINGS}}
