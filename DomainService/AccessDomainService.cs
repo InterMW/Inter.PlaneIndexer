@@ -33,28 +33,19 @@ public class AccessDomainService : IAccessDomainService
         var now = DateTime.UtcNow;
 
         var lastMinuteSecond = MinuteAlignedTimestamp(time);
-        // if you are early (before latest minute)  then get from redis
-        // if yu are on time (between -1m and -2m) then find out what the last seen is.
-        //  If the last seen is -1m, then you already have the info
-        //  If the last seen is -2m or more
+        //Case 1: Too early for couchbase
         if(time > lastMinuteSecond)
         {
             return await GetPlaneDataFromRedis(hexValue,lastMinuteSecond, time, time - 60);
         }
+
+        //Case 2: Maybe too early for couchbase
         if(time == lastMinuteSecond-60)
         {
-            //get last seen
-            var lastSeen = await _lastSeenPointerRepository.GetLastSeenTimeAsync(hexValue);
-            
-            if(lastSeen == time)
-            {
-                //we are here because we have already stored this info
-                return await _planeHistoryRepository.GetPlaneHistory(hexValue,time);
-            }
-            //we have not recoreded this minute yet, fetch from redis
-            //
-            return await GetPlaneDataFromRedis(hexValue,time,time+59, lastSeen);
+            return await CheckLongtermDefaultToCache(hexValue, time);
         }
+        
+        //Case 3: Out of redis
         
         var result = await _planeHistoryRepository.GetPlaneHistory(hexValue,time);
         
@@ -64,6 +55,21 @@ public class AccessDomainService : IAccessDomainService
         }
         
         return result;
+    }
+    
+    private async Task<PlaneDataRecordLink> CheckLongtermDefaultToCache(string hexValue, long time)
+    {
+        var lastSeen = await _lastSeenPointerRepository.GetLastSeenTimeAsync(hexValue);
+        
+        if(lastSeen == time)
+        {
+            //we are here because we have already stored this info
+            return await _planeHistoryRepository.GetPlaneHistory(hexValue,time);
+        }
+        //we have not recoreded this minute yet, fetch from redis
+        //
+        return await GetPlaneDataFromRedis(hexValue,time,time+59, lastSeen);
+    
     }
     
     private async Task<PlaneDataRecordLink> GetPlaneDataFromRedis(
