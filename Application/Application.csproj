@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>4a23206e-976b-4f69-89fa-f33af2024be5</UserSecretsId>
+  </PropertyGroup>
+
+  
+  <ItemGroup>
+  		<PackageReference Include="MelbergFramework.Application" Version="6.0.67" />
+      <PackageReference Include="MelbergFramework.Infrastructure.InfluxDB" Version="6.0.67" />
+  		<PackageReference Include="MelbergFramework.Infrastructure.Rabbit" Version="6.0.67" />
+  		<PackageReference Include="MelbergFramework.Infrastructure.Redis" Version="6.0.67" />
+      <PackageReference Include="MelbergFramework.Infrastructure.Couchbase" Version="6.1.4" />
+      <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.7" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\Domain\Domain.csproj" />
+    <ProjectReference Include="..\DomainService\DomainService.csproj" />
+    <ProjectReference Include="..\Infrastructure.Redis\Infrastructure.Redis.csproj" />
+    <ProjectReference Include="..\Infrastructure.Couchbase\Infrastructure.Couchbase.csproj" />
+    <ProjectReference Include="..\Infrastructure.RepositoryCore\Infrastructure.RepositoryCore.csproj" />
+  </ItemGroup>
+</Project>
