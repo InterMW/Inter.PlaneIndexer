@@ -27,29 +27,19 @@ public class AggregaterDomainService : IAggregaterDomainService
     public async Task AggregatePlanes(long now)
     {
         var offsetTime = now - 60;
-        var relevantPlanes = await _planeHistoryCache.GetPlanesInRange(offsetTime, offsetTime + 59).ToListAsync();
-        //Fix this, make it so that it uses configuration, maybe we should hold onto info for a full 2 min?
-        Console.WriteLine(relevantPlanes.Count);
+        var relevantPlanes = await _planeHistoryCache.GetPlanesInMinute(offsetTime);
         
-        
-        var seenPlanes = relevantPlanes.Select(_ => _.Data.HexValue).ToHashSet().ToList();
-        foreach( var hexValue in seenPlanes)
+        foreach( var hexValue in relevantPlanes)
         {
             var data = new PlaneDataRecordLink()
             {
                 PreviousLink = await _lastSeenRepository.GetLastSeenTimeAsync(hexValue),
-                Planes = relevantPlanes.Where(_ => _.Data.HexValue == hexValue)
+                Planes = await _planeHistoryCache.GetPlaneMinute(hexValue,offsetTime)
             };
             
             await _planeHistoryRepository.StorePlaneHistory(hexValue,offsetTime, data);
             
             await _lastSeenRepository.SetLastSeenTimeAsync(hexValue,offsetTime);
-
         }
     }
-    
-    private async Task StoreInfo(string hexValue, long now, IEnumerable<TimestampedPlaneRecord> records )
-    {
-    }
-
 }

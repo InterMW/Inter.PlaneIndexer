@@ -18,5 +18,5 @@ public class IndexerController
     [HttpGet]
     [Route("history")]
     public Task<PlaneDataRecordLink> GetHistoryForPlane([FromQuery] string hexValue, [FromQuery] long? time) =>
-        _service.RetrievePlaneHistory(hexValue,time ?? (long)(DateTime.UtcNow - DateTime.UnixEpoch).TotalSeconds);
+        _service.RetrievePlaneHistory(hexValue.ToLower(),time ?? (long)(DateTime.UtcNow - DateTime.UnixEpoch).TotalSeconds);
 }

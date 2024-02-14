@@ -1,3 +1,4 @@
+using Common;
 using Domain;
 using Infrastructure.Repository.Core;
 
@@ -26,69 +27,73 @@ public class AccessDomainService : IAccessDomainService
 
     public async Task<PlaneDataRecordLink> RetrievePlaneHistory(string hexValue, long time)
     {
-        if(time == 0)
-        {
-            return new();
-        }
+        if (time == 0) { return new(); }//Nothing to find
         var now = DateTime.UtcNow;
+        var lastMin = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0);
 
-        var lastMinuteSecond = MinuteAlignedTimestamp(time);
+        var lastMinuteSecond = (long)(lastMin - DateTime.UnixEpoch).TotalSeconds;
+        var lastMinuteSecondBefore = lastMinuteSecond - 60;
+
         //Case 1: Too early for couchbase
-        if(time > lastMinuteSecond)
+        if (time > lastMinuteSecond)
         {
-            return await GetPlaneDataFromRedis(hexValue,lastMinuteSecond, time, time - 60);
+            return await EarlyCase(hexValue,lastMinuteSecond);
         }
 
         //Case 2: Maybe too early for couchbase
-        if(time == lastMinuteSecond-60)
+        if (time == lastMinuteSecondBefore)
         {
-            return await CheckLongtermDefaultToCache(hexValue, time);
+            return await RaceCase(hexValue,time);
         }
-        
-        //Case 3: Out of redis
-        
-        var result = await _planeHistoryRepository.GetPlaneHistory(hexValue,time);
-        
-        if(result.PreviousLink == 0 && !result.Planes.Any())
-        {
-            result.PreviousLink = await _lastSeenPointerRepository.GetLastSeenTimeAsync(hexValue);
-        }
-        
-        return result;
-    }
-    
-    private async Task<PlaneDataRecordLink> CheckLongtermDefaultToCache(string hexValue, long time)
-    {
-        var lastSeen = await _lastSeenPointerRepository.GetLastSeenTimeAsync(hexValue);
-        
-        if(lastSeen == time)
-        {
-            //we are here because we have already stored this info
-            return await _planeHistoryRepository.GetPlaneHistory(hexValue,time);
-        }
-        //we have not recoreded this minute yet, fetch from redis
-        //
-        return await GetPlaneDataFromRedis(hexValue,time,time+59, lastSeen);
-    
-    }
-    
-    private async Task<PlaneDataRecordLink> GetPlaneDataFromRedis(
-        string hexValue,
-        long startTime, 
-        long endTime, 
-        long previousLink) => new()
-        {
-            Planes = await _planeCacheRepository.GetPlanesInRange(startTime,endTime,hexValue).ToListAsync(),
-            PreviousLink = previousLink
-        };
 
-    
-    private long MinuteAlignedTimestamp(long time)
+        return await _planeHistoryRepository.GetPlaneHistory(hexValue,time.ToLastMinInSec());
+    }
+    //First case is early, we get the plane data and find out from redis 
+    private async Task<PlaneDataRecordLink> EarlyCase(string hexValue, long lastMinuteSecond)
     {
-        var offsetTime = DateTime.UtcNow.AddSeconds(time);
+        long lastMinuteSecondBefore = lastMinuteSecond - 60;
+        var planesFromLastMinute = await _planeCacheRepository.GetPlanesInMinute(lastMinuteSecondBefore);
+        long lastSeen = 0;
+
+        if (planesFromLastMinute.Any(_ => _ == hexValue))
+        {
+            lastSeen = lastMinuteSecondBefore;
+        }
+        else
+        {
+            lastSeen = await _lastSeenPointerRepository.GetLastSeenTimeAsync(hexValue);
+        }
+
+        return new()
+        {
+            Planes = await _planeCacheRepository.GetPlaneMinute(hexValue, lastMinuteSecond),
+            PreviousLink = lastSeen
+        };
+    }
+
+    private async Task<PlaneDataRecordLink> RaceCase(string hexValue, long lastMinuteSecond)
+    {
+        long lastSeen = await _lastSeenPointerRepository.GetLastSeenTimeAsync(hexValue);
+
+        if (lastSeen == lastMinuteSecond) // We already have the info
+        {
+            return await _planeHistoryRepository.GetPlaneHistory(hexValue,lastMinuteSecond);
+        }
         
-        var minuteAlignedTime = offsetTime.AddSeconds(0 - offsetTime.Second);
+        //We don't have the info, check redis
+        long lastMinuteSecondBefore = lastMinuteSecond - 60;
+
+        var planesFromLastMinute = await _planeCacheRepository.GetPlanesInMinute(lastMinuteSecondBefore);
         
-        return (long)minuteAlignedTime.Subtract(DateTime.UnixEpoch).TotalSeconds;
+        if(planesFromLastMinute.Any(_ => _ == hexValue))
+        {
+            return new()
+            {
+                Planes = await _planeCacheRepository.GetPlaneMinute(hexValue, lastMinuteSecond),
+                PreviousLink = lastMinuteSecondBefore
+            };
+        }
+        
+        return new();//We don't have anything
     }
 }

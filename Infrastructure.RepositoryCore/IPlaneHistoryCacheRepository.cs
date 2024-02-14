@@ -4,6 +4,7 @@ namespace Infrastructure.Repository.Core;
 
 public interface IPlaneHistoryCacheRepository
 {
-    Task RecordPlane(Plane plane, long now);
-    IAsyncEnumerable<TimestampedPlaneRecord> GetPlanesInRange(long start, long end, string hexValue = "*");
+    Task RecordPlane(PlaneMinimal plane, long min);
+    Task<IEnumerable<string>> GetPlanesInMinute(long min);
+    Task<IEnumerable<PlaneMinimal>> GetPlaneMinute(string hexValue, long min);
 }
