@@ -2,6 +2,6 @@ namespace Domain;
 
 public class PlaneDataRecordLink
 {
-    public IEnumerable<TimestampedPlaneRecord> Planes {get; set;} = Array.Empty<TimestampedPlaneRecord>();
+    public IEnumerable<PlaneMinimal> Planes {get; set;} = Array.Empty<PlaneMinimal>();
     public long? PreviousLink {get; set;}
 }

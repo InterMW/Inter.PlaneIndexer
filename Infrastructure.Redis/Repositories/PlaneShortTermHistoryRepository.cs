@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using Common;
 using Domain;
 using Infrastructure.Redis.Contexts;
@@ -5,6 +7,7 @@ using Infrastructure.Repository.Core;
 using MelbergFramework.Infrastructure.Redis.Repository;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using StackExchange.Redis;
 
 namespace Infrastructure.Redis.Repository;
 
@@ -17,31 +20,29 @@ public class PlaneShortTermHistoryRepository : RedisRepository<PlaneHistoryConte
     {
         _documentLifetime = TimeSpan.FromSeconds(options.Value.PlaneDocLifetimesSecs);
     }
-
-    public Task RecordPlane(Plane plane, long now) =>
-        DB.StringSetAsync(
-            ToKey(plane, now),
-            JsonConvert.SerializeObject(plane),
-            _documentLifetime
-        );
-    
-    public async IAsyncEnumerable<TimestampedPlaneRecord> GetPlanesInRange(long start, long end, string hexValue = "*")
+    public async Task RecordPlane(PlaneMinimal plane, long now)
     {
-        for(long time = start; time <= end; time ++)
-        {
-            await foreach(var key in Server.KeysAsync(pattern:ToKey(hexValue,time)))
-            {
-                var result = await DB.StringGetAsync(key);
-                yield return new()
-                {
-                    Timestamp = time,
-                    Data = JsonConvert.DeserializeObject<Plane>(result)
-                };
-            }
-        }
+        var key = ToKey(plane,now);
+        var checkinKey = ToCheckinKey(now);
+        await DB.SetAddAsync(checkinKey,plane.HexValue);
+        await DB.KeyExpireAsync(checkinKey,_documentLifetime);
+        await DB.ListRightPushAsync(key,JsonConvert.SerializeObject(plane));
+        await DB.KeyExpireAsync(key,_documentLifetime);
+    } 
+
+    public async Task<IEnumerable<string>> GetPlanesInMinute(long min)
+    {
+        return (await DB.SetMembersAsync(ToCheckinKey(min))).Select(_ => (string)_);
     }
     
+    public async Task<IEnumerable<PlaneMinimal>> GetPlaneMinute(string hexValue, long min)
+    {
+        var planes = await DB.ListRangeAsync(ToKey(hexValue,min));
+        return planes.Select(_ => JsonConvert.DeserializeObject<PlaneMinimal>(_));
+    }
+    
+    static string ToCheckinKey(long now) => $"plane_indexer_checkin_{now}";
     static string ToKey(string hexValue, long now) =>$"plane_indexer_{hexValue}_{now}";
-    static string ToKey(Plane plane, long now) => ToKey(plane.HexValue,now);
+    static string ToKey(PlaneMinimal plane, long now) => ToKey(plane.HexValue,now);
 
 }
