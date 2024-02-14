@@ -30,6 +30,8 @@ This project requires dotnet 6 sdk to run (install link [here](https://dotnet.mi
 When running locally, I have the rabbit password replaced using the dotnet user-secrets tool. 
 Please follow Microsoft's [guide](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-6.0&tabs=linux) to set the value of rabbit_pass to your configured rabbit account's password for the Applications.csproj.
 
+This project uses the MelbergFramework nuget package, please see [my github](https://github.com/Joseph-Melberg/) for more info.
+
 ## Required Infrastructure
 |Product|Details|Database Install Link|
 |-|-|-|
