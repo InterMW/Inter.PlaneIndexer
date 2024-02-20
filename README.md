@@ -35,6 +35,6 @@ This project uses the MelbergFramework nuget package, please see [its github rep
 ## Required Infrastructure
 |Product|Details|Database Install Link|
 |-|-|-|
-|Redis| Update the DefaultContext value of the ConnectionStrings section of [appsettings.json](Application/appsettings.json).| Docker installation guide for redis [here](https://github.com/bitnami/containers/blob/main/bitnami/redis/README.md).|
+|Redis| Update the PlaneHistoryContext value of the ConnectionStrings section of [appsettings.json](Application/appsettings.json).| Docker installation guide for redis [here](https://github.com/bitnami/containers/blob/main/bitnami/redis/README.md).|
 |RabbitMQ| The code will create the exchanges, queues, and bindings for you, just update the Rabbit:ClientDeclarations:Connections:0 details in [appsettings.json](Application/appsettings.json).| Docker installation guide for RabbitMQ [here](https://hub.docker.com/_/rabbitmq).|
-
+|Couchbase| Update the Couchbase section with your url and a user that has Full Admin rights.| Docker installation guide for Couchbase [here](https://docs.couchbase.com/server/current/install/getting-started-docker.html)|
