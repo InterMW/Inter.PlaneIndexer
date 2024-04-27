@@ -1,3 +1,4 @@
+using System.Globalization;
 using DomainService;
 using MelbergFramework.Infrastructure.Rabbit.Consumers;
 using MelbergFramework.Infrastructure.Rabbit.Extensions;
@@ -19,8 +20,12 @@ public class IndexProcessor : IStandardConsumer
     }
     public async Task ConsumeMessageAsync(Message message, CancellationToken ct)
     {
-        var time = ExtractTimestamp(message.GetTimestamp());
-
+            
+        var  j= DateTime.ParseExact((string)message.Headers["timestamp"],"MM/dd/yyyy hh:mm:ss", 
+        CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal); 
+        
+        var time = ExtractTimestamp(j);
+        
         await _domainService.AggregatePlanes(time); 
         
         _logger.LogInformation("Aggregated for minute {time}", time);

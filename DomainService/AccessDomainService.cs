@@ -1,6 +1,7 @@
 using Common;
 using Domain;
 using Infrastructure.Repository.Core;
+using MelbergFramework.Core.Time;
 
 namespace DomainService;
 
@@ -14,31 +15,35 @@ public class AccessDomainService : IAccessDomainService
     private readonly IPlaneHistoryCacheRepository _planeCacheRepository;
     private readonly IPlaneHistoryRepository _planeHistoryRepository;
     private readonly ILastSeenPointerRepository _lastSeenPointerRepository;
+    private readonly IClock _clock;
 
     public AccessDomainService(
         IPlaneHistoryCacheRepository planeCacheRepository,
         IPlaneHistoryRepository planeHistoryRepository,
-        ILastSeenPointerRepository lastSeenPointerRepository)
+        ILastSeenPointerRepository lastSeenPointerRepository,
+        IClock clock)
     {
         _planeCacheRepository = planeCacheRepository;
         _lastSeenPointerRepository = lastSeenPointerRepository;
         _planeHistoryRepository = planeHistoryRepository;
+        _clock = clock;
     }
 
     public async Task<PlaneDataRecordLink> RetrievePlaneHistory(string hexValue, long time)
     {
         if (time == 0) { return new(); }//Nothing to find
-        var now = DateTime.UtcNow;
+        var now = _clock.GetUtcNow();
         var lastMin = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0);
 
         var lastMinuteSecond = (long)(lastMin - DateTime.UnixEpoch).TotalSeconds;
-        var lastMinuteSecondBefore = lastMinuteSecond - 60;
 
         //Case 1: Too early for couchbase
         if (time > lastMinuteSecond)
         {
             return await EarlyCase(hexValue,lastMinuteSecond);
         }
+
+        var lastMinuteSecondBefore = lastMinuteSecond - 60;
 
         //Case 2: Maybe too early for couchbase
         if (time == lastMinuteSecondBefore)
@@ -61,7 +66,7 @@ public class AccessDomainService : IAccessDomainService
         }
         else
         {
-            lastSeen = await _lastSeenPointerRepository.GetLastSeenTimeAsync(hexValue);
+            lastSeen = (await _lastSeenPointerRepository.GetLastSeenRecordAsync(hexValue)).Time;
         }
 
         return new()
@@ -73,7 +78,7 @@ public class AccessDomainService : IAccessDomainService
 
     private async Task<PlaneDataRecordLink> RaceCase(string hexValue, long lastMinuteSecond)
     {
-        long lastSeen = await _lastSeenPointerRepository.GetLastSeenTimeAsync(hexValue);
+        long lastSeen = (await _lastSeenPointerRepository.GetLastSeenRecordAsync(hexValue)).Time;
 
         if (lastSeen == lastMinuteSecond) // We already have the info
         {

@@ -18,16 +18,21 @@ public class IngressDomainService : IIngressDomainService
     public Task RecordPlanes(IEnumerable<Plane> planes, long now)
     {
         var lastMin = now.ToLastMinInSec();
+
         return Task.WhenAll(planes.Select(_ => _historyCache.RecordPlane(ToMinimal(_, now), lastMin)));
     } 
     
-    private static PlaneMinimal ToMinimal(Plane plane, long now) =>
-        new()
+    private static PlaneMinimal ToMinimal(Plane plane, long now)
+    {
+        Console.WriteLine(plane.Altitude ?? 0);
+        return new()
         {
             Time = now,
             HexValue = plane.HexValue,
             Altitude = plane.Altitude ?? 0,
-            Latitude = plane.Latitude ?? 0,
-            Longitude = plane.Longitude ?? 0
+            Latitude = (int?)plane.Latitude ?? 0,
+            Longitude = (int?)plane.Longitude ?? 0
         };
+
+    }
 }
