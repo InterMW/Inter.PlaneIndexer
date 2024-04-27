@@ -25,7 +25,6 @@ public class PlaneShortTermHistoryRepository : RedisRepository<PlaneHistoryConte
             var checkinKey = ToCheckinKey(now);
             await DB.SetAddAsync(checkinKey,plane.HexValue);
             await DB.KeyExpireAsync(checkinKey,_documentLifetime);
-            Console.WriteLine(key);
             await DB.ListRightPushAsync(key,JsonConvert.SerializeObject(plane));
             await DB.KeyExpireAsync(key,_documentLifetime);
         }
