@@ -68,7 +68,7 @@ public partial class IndexerTests : BaseTestFrame
             _ => ConsumeIngressMessage(),
             _ => Index_planes_for_minute_starting_at(60),
             _ => Request(60,180),
-            _ => Verify_link_is_to_value(0),
+            _ => Verify_link_is_to_value(null),
             _ => Verify_planes_from_time_are_present(60)
         );
     }

@@ -24,7 +24,6 @@ public class IngressDomainService : IIngressDomainService
     
     private static PlaneMinimal ToMinimal(Plane plane, long now)
     {
-        Console.WriteLine(plane.Altitude ?? 0);
         return new()
         {
             Time = now,

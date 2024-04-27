@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />
@@ -12,14 +12,14 @@
 
   <ItemGroup>
     <PackageReference Include="LightBDD.MsTest3" Version="3.7.0" />
-    <PackageReference Include="MelbergFramework.Application" Version="8.0.6" />
-    <PackageReference Include="MelbergFramework.ComponentTesting.Redis" Version="8.0.5" />
-    <PackageReference Include="MelbergFramework.ComponentTesting.Couchbase" Version="8.0.8" />
-    <PackageReference Include="MelbergFramework.Infrastructure.Couchbase" Version="8.0.8" />
-    <PackageReference Include="MelbergFramework.Core" Version="8.0.6" />
-    <PackageReference Include="MelbergFramework.Core.ComponentTesting" Version="8.0.6" />
-    <PackageReference Include="MelbergFramework.Infrastructure.Rabbit" Version="8.0.12" />
-    <PackageReference Include="MelbergFramework.ComponentTesting.Rabbit" Version="8.0.12" />
+    <PackageReference Include="MelbergFramework.Application" Version="8.0.7" />
+    <PackageReference Include="MelbergFramework.ComponentTesting.Redis" Version="8.0.7" />
+    <PackageReference Include="MelbergFramework.ComponentTesting.Couchbase" Version="8.0.9" />
+    <PackageReference Include="MelbergFramework.Infrastructure.Couchbase" Version="8.0.9" />
+    <PackageReference Include="MelbergFramework.Core" Version="8.0.7" />
+    <PackageReference Include="MelbergFramework.Core.ComponentTesting" Version="8.0.7" />
+    <PackageReference Include="MelbergFramework.Infrastructure.Rabbit" Version="8.0.13" />
+    <PackageReference Include="MelbergFramework.ComponentTesting.Rabbit" Version="8.0.13" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="xunit" Version="2.7.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.0.4" />

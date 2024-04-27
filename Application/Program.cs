@@ -1,3 +1,4 @@
+using Application.Controllers;
 using MelbergFramework.Application;
 
 namespace Application;

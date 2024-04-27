@@ -7,6 +7,7 @@ using Infrastructure.Redis.Contexts;
 using Infrastructure.Redis.Repository;
 using Infrastructure.Repository.Core;
 using MelbergFramework.Application;
+using MelbergFramework.Core.Time;
 using MelbergFramework.Infrastructure.Couchbase;
 using MelbergFramework.Infrastructure.Rabbit;
 using MelbergFramework.Infrastructure.Rabbit.Messages;
@@ -28,6 +29,8 @@ public class AppRegistrator : Registrator
         CouchbaseModule.RegisterCouchbaseBucket<ILastSeenPointerRepository,LastSeenPointerRepository>(services);
         CouchbaseModule.RegisterCouchbaseBucket<IPlaneHistoryRepository,PlaneHistoryRepository>(services);
         RedisDependencyModule.LoadRedisRepository<IPlaneHistoryCacheRepository,PlaneShortTermHistoryRepository,PlaneHistoryContext>(services);
+        
+        services.AddSingleton<IClock,Clock>();
 
         services.AddOptions<TimingsOptions>()
             .BindConfiguration(TimingsOptions.Timing)
