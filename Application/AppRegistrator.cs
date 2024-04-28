@@ -20,7 +20,7 @@ public class AppRegistrator : Registrator
     public override void RegisterServices(IServiceCollection services)
     {
         RabbitModule.RegisterMicroConsumer<IngressProcessor, CompletedPlaneFrameMessage>(services,false);
-        RabbitModule.RegisterMicroConsumer<IndexProcessor, TickMessage>(services,false);
+        RabbitModule.RegisterMicroConsumer<IndexProcessor, TickMessage>(services,true);
 
         services.AddTransient<IIngressDomainService,IngressDomainService>();
         services.AddTransient<IAggregaterDomainService,AggregaterDomainService>();

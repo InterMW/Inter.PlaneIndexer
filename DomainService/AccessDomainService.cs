@@ -28,11 +28,6 @@ public class AccessDomainService : IAccessDomainService
         _planeHistoryRepository = planeHistoryRepository;
         _clock = clock;
     }
-    
-    /*
-     * There are three stages.
-     *
-     */
 
     public async Task<PlaneDataRecordLink> RetrievePlaneHistory(string hexValue, long time)
     {
