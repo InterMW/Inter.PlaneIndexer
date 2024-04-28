@@ -1,13 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using Common;
 using Domain;
 using Infrastructure.Redis.Contexts;
 using Infrastructure.Repository.Core;
-using MelbergFramework.Infrastructure.Redis.Repository;
+using MelbergFramework.Infrastructure.Redis;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using StackExchange.Redis;
 
 namespace Infrastructure.Redis.Repository;
 
@@ -38,7 +35,11 @@ public class PlaneShortTermHistoryRepository : RedisRepository<PlaneHistoryConte
     public async Task<IEnumerable<PlaneMinimal>> GetPlaneMinute(string hexValue, long min)
     {
         var planes = await DB.ListRangeAsync(ToKey(hexValue,min));
-        return planes.Select(_ => JsonConvert.DeserializeObject<PlaneMinimal>(_));
+        if(planes.Any() && planes[0].HasValue)
+        {
+            return planes.Select(_ => JsonConvert.DeserializeObject<PlaneMinimal>(_));
+        }
+        return Array.Empty<PlaneMinimal>();
     }
     
     static string ToCheckinKey(long now) => $"plane_indexer_checkin_{now}";

@@ -1,8 +1,8 @@
-FROM mcr.microsoft.com/dotnet/aspnet:6.0
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 COPY app App/
 WORKDIR /App
 EXPOSE 80
-EXPOSE 8180
+EXPOSE 8080
 ENTRYPOINT ["dotnet", "Application.dll"]
 
 RUN apt-get update \ 
@@ -10,4 +10,4 @@ RUN apt-get update \
 LABEL deunhealth.restart.on.unhealthy "true"
 
 HEALTHCHECK  --interval=30s --timeout=3s --start-period=10s\
-  CMD wget --no-verbose --tries=1 -O /dev/null http://localhost:8180/health
+  CMD wget --no-verbose --tries=1 -O /dev/null http://localhost:8080/health

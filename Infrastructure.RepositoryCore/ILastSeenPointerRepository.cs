@@ -1,7 +1,9 @@
+using Domain;
+
 namespace Infrastructure.Repository.Core;
 
 public interface ILastSeenPointerRepository
 {
-    Task<long> GetLastSeenTimeAsync(string hexValue);
-    Task SetLastSeenTimeAsync(string hexValue, long lastSeenMinute);
+    Task<PlaneMinimal> GetLastSeenRecordAsync(string hexValue);
+    Task SetLastSeenRecordAsync(PlaneMinimal record);
 }

@@ -1,4 +1,4 @@
-﻿using Couchbase.Core.Exceptions.KeyValue;
+﻿using Domain;
 using Infrastructure.Repository.Core;
 using MelbergFramework.Infrastructure.Couchbase;
 
@@ -9,22 +9,21 @@ public class LastSeenPointerRepository : BaseRepository, ILastSeenPointerReposit
     {
     }
 
-    public async Task<long> GetLastSeenTimeAsync(string hexValue)
+    public async Task<PlaneMinimal> GetLastSeenRecordAsync(string hexValue)
     {
         try
         {
             var result = await Collection.GetAsync(hexValue);
-            return result.ContentAs<long>();
+            return result.ContentAs<PlaneMinimal>();
         }
-        catch (DocumentNotFoundException)
+        catch (Exception)
         {
-            return 0;
+            return new PlaneMinimal();
         }
-
     }
 
-    public Task SetLastSeenTimeAsync(string hexValue, long lastSeenMinute)
+    public Task SetLastSeenRecordAsync(PlaneMinimal record)
     {
-        return Collection.UpsertAsync(hexValue,lastSeenMinute);
+        return Collection.UpsertAsync(record.HexValue,record);
     }
 }
