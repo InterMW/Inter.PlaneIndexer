@@ -13,7 +13,7 @@
   <ItemGroup>
     <PackageReference Include="LightBDD.MsTest3" Version="3.7.0" />
     <PackageReference Include="MelbergFramework.Application" Version="8.0.7" />
-    <PackageReference Include="MelbergFramework.ComponentTesting.Redis" Version="8.0.7" />
+    <PackageReference Include="MelbergFramework.ComponentTesting.Redis" Version="8.0.8" />
     <PackageReference Include="MelbergFramework.ComponentTesting.Couchbase" Version="8.0.9" />
     <PackageReference Include="MelbergFramework.Infrastructure.Couchbase" Version="8.0.9" />
     <PackageReference Include="MelbergFramework.Core" Version="8.0.7" />

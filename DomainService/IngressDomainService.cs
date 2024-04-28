@@ -29,8 +29,8 @@ public class IngressDomainService : IIngressDomainService
             Time = now,
             HexValue = plane.HexValue,
             Altitude = plane.Altitude ?? 0,
-            Latitude = (int?)plane.Latitude ?? 0,
-            Longitude = (int?)plane.Longitude ?? 0
+            Latitude = plane.Latitude ?? 0,
+            Longitude = plane.Longitude ?? 0
         };
 
     }

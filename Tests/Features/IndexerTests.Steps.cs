@@ -36,32 +36,8 @@ public partial class IndexerTests : BaseTestFrame
               Now = value,
                Planes = _planes[value]
             });
-    }
-    public async Task Plane_comes_in_at_120()
-    {
-         var mockTranslator = 
-            (MockTranslator<CompletedPlaneFrameMessage>)
-            GetClass<IJsonToObjectTranslator<CompletedPlaneFrameMessage>>();
-
-         mockTranslator
-            .Messages.Add(new CompletedPlaneFrameMessage()
-            {
-              Now = 120,
-               Planes = new []{new Plane(){ Longitude = 1, Latitude = 2, Altitude = 3, HexValue = "h"}}
-            });
-    }
-
-    public async Task ConsumeIngressMessage()
-    {
         await GetIngressService()
             .ConsumeMessageAsync(new Message(),CancellationToken.None);
-    }
-
-    public async Task Verify_plane_ingress(long time)
-    {                                                                                 
-        var planes = await GetClass<IPlaneHistoryCacheRepository>().GetPlanesInMinute(time);
-
-        Assert.IsTrue(planes.Contains("h"));
     }
 
     public async Task Index_planes_for_minute_starting_at(long time)
@@ -89,11 +65,6 @@ public partial class IndexerTests : BaseTestFrame
         }
     }
     
-    public async Task Verify_response_not_empty()
-    {
-        Assert.IsTrue(_response.Planes.Any());
-    }
-
     public async Task Verify_last_seen(long time)
     {
         var seen = await GetClass<ILastSeenPointerRepository>().GetLastSeenRecordAsync("h");
@@ -104,38 +75,26 @@ public partial class IndexerTests : BaseTestFrame
         Assert.AreEqual(3, seen.Altitude);
     }
 
-    public async Task Request(long time, long currentTime)
+    public async Task Request(long? time, long currentTime)
     {
         var clock = (MockClock)GetClass<IClock>();
         clock.NewCurrentTime = DateTime.UnixEpoch.AddSeconds(currentTime);
-        var controller = new IndexerController(GetClass<IAccessDomainService>());
+        var controller = new IndexerController(GetClass<IAccessDomainService>(), GetClass<IClock>());
         _response = await controller.GetHistoryForPlane("h",time);
     }
 
     public async Task Request_second_zero()
     {
-        var controller = new IndexerController(GetClass<IAccessDomainService>());
+        var controller = new IndexerController(GetClass<IAccessDomainService>(), GetClass<IClock>());
         _response = await controller.GetHistoryForPlane("a",0);
-    }
-    
-    public async Task Response_is_proper()
-    {
-        Assert.AreEqual(0,_response.Planes.Count());
-        Assert.IsNull(_response.PreviousLink);
-    }
-    
-    public async Task Response_is_empty()
-    {
-        Assert.AreEqual(0,_response.Planes.Count());
-        Assert.IsNull(_response.PreviousLink);
     }
     
     private PlaneMinimal ToMinimal(Plane plane, long time) => new PlaneMinimal()
     {
-        Altitude = (int)plane.Altitude.Value,
-        Longitude = (int)plane.Longitude.Value,
+        Altitude = plane.Altitude.Value,
+        Longitude = plane.Longitude.Value,
         HexValue = plane.HexValue,
-        Latitude = (int)plane.Latitude,
+        Latitude = plane.Latitude.Value,
         Time = time
     };
 }

@@ -19,20 +19,12 @@ public class PlaneShortTermHistoryRepository : RedisRepository<PlaneHistoryConte
     }
     public async Task RecordPlane(PlaneMinimal plane, long now)
     {
-        try
-        {
-            var key = ToKey(plane,now);
-            var checkinKey = ToCheckinKey(now);
-            await DB.SetAddAsync(checkinKey,plane.HexValue);
-            await DB.KeyExpireAsync(checkinKey,_documentLifetime);
-            await DB.ListRightPushAsync(key,JsonConvert.SerializeObject(plane));
-            await DB.KeyExpireAsync(key,_documentLifetime);
-        }
-        catch (System.Exception)
-        {
-            
-            throw;
-        }
+        var key = ToKey(plane,now);
+        var checkinKey = ToCheckinKey(now);
+        await DB.SetAddAsync(checkinKey,plane.HexValue);
+        await DB.KeyExpireAsync(checkinKey,_documentLifetime);
+        await DB.ListRightPushAsync(key,JsonConvert.SerializeObject(plane));
+        await DB.KeyExpireAsync(key,_documentLifetime);
     } 
 
     public async Task<IEnumerable<string>> GetPlanesInMinute(long min)

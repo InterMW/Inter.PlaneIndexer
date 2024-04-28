@@ -20,15 +20,11 @@ public class IndexProcessor : IStandardConsumer
     }
     public async Task ConsumeMessageAsync(Message message, CancellationToken ct)
     {
-            
-        var  j= DateTime.ParseExact((string)message.Headers["timestamp"],"MM/dd/yyyy hh:mm:ss", 
-        CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal); 
-        
-        var time = ExtractTimestamp(j);
+        var time = ExtractTimestamp(message.GetTimestamp());
         
         await _domainService.AggregatePlanes(time); 
         
-        _logger.LogInformation("Aggregated for minute {time}", time);
+        _logger.LogInformation("Aggregated for minute {time}", time-60);
 
     }
     private long ExtractTimestamp(DateTime time) => 
