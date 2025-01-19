@@ -9,10 +9,10 @@
 
   
   <ItemGroup>
-  	<PackageReference Include="MelbergFramework.Application" Version="8.0.7" />
-  	<PackageReference Include="MelbergFramework.Infrastructure.Redis" Version="8.0.8" />
-    <PackageReference Include="MelbergFramework.Infrastructure.Rabbit" Version="8.0.13" />
-    <PackageReference Include="MelbergFramework.Infrastructure.Couchbase" Version="8.0.9" />
+  	<PackageReference Include="MelbergFramework.Application" Version="8.0.10" />
+  	<PackageReference Include="MelbergFramework.Infrastructure.Redis" Version="8.0.9" />
+    <PackageReference Include="MelbergFramework.Infrastructure.Rabbit" Version="8.0.15" />
+    <PackageReference Include="MelbergFramework.Infrastructure.Couchbase" Version="8.0.11" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.7" />
   </ItemGroup>
