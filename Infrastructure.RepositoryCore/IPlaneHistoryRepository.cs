@@ -8,4 +8,5 @@ public interface IPlaneHistoryRepository
     Task<PlaneDataRecordLink> GetPlaneHistory(string hexValue, long minuteInSeconds);
     Task<PlaneMinimal> GetPlanePointer(string hexValue);
     Task UpdatePlanePointer(PlaneMinimal plane);
+    Task CleanupOldPlaneLinks(long minuteInSeconds);
 }

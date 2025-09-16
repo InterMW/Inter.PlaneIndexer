@@ -28,6 +28,7 @@ public class AggregaterDomainService : IAggregaterDomainService
         var offsetTime = now - 60;
         var relevantPlanes = await _planeHistoryCache.GetPlanesInMinute(offsetTime);
         await Task.WhenAll(relevantPlanes.Select(_ => CompilePlane(_, offsetTime)));
+        await _planeHistoryRepository.CleanupOldPlaneLinks(now - 60 * 60 * 24);
     }
 
     private async Task CompilePlane(string hexValue, long offsetTime)
