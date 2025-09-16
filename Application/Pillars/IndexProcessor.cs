@@ -22,7 +22,17 @@ public class IndexProcessor : IStandardConsumer
     {
         var time = ExtractTimestamp(message.GetTimestamp());
         
-        await _domainService.AggregatePlanes(time); 
+        _logger.LogInformation("Trying");
+        try
+        {
+            await _domainService.AggregatePlanes(time); 
+        }
+        catch (System.Exception ex)
+        {
+            
+            _logger.LogInformation("whell");
+            Console.Write(ex.Message);
+        }
         
         _logger.LogInformation("Aggregated for minute {time}", time-60);
 

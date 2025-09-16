@@ -6,7 +6,7 @@ using MelbergFramework.Infrastructure.Couchbase;
 
 namespace Infrastructure.Couchbase;
 
-public class PlaneHistoryRepository : BaseRepository, IPlaneHistoryRepository
+public class PlaneHistoryRepository : BaseRepository//, IPlaneHistoryRepository
 {
     private UpsertOptions _defaultOptions;
     public PlaneHistoryRepository(IBucketFactory factory) : base("long_term", factory)

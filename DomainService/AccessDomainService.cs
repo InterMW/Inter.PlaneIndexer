@@ -14,17 +14,14 @@ public class AccessDomainService : IAccessDomainService
 {
     private readonly IPlaneHistoryCacheRepository _planeCacheRepository;
     private readonly IPlaneHistoryRepository _planeHistoryRepository;
-    private readonly ILastSeenPointerRepository _lastSeenPointerRepository;
     private readonly IClock _clock;
 
     public AccessDomainService(
         IPlaneHistoryCacheRepository planeCacheRepository,
         IPlaneHistoryRepository planeHistoryRepository,
-        ILastSeenPointerRepository lastSeenPointerRepository,
         IClock clock)
     {
         _planeCacheRepository = planeCacheRepository;
-        _lastSeenPointerRepository = lastSeenPointerRepository;
         _planeHistoryRepository = planeHistoryRepository;
         _clock = clock;
     }
@@ -63,8 +60,7 @@ public class AccessDomainService : IAccessDomainService
         var planesFromLastMinute = await _planeCacheRepository.GetPlanesInMinute(lastMinuteSecondBefore);
         var planesImmediatelyBefore = planesFromLastMinute.Any(_ => _ == hexValue);
         long lastSeen = planesImmediatelyBefore ?
-            lastMinuteSecondBefore :
-            (await _lastSeenPointerRepository.GetLastSeenRecordAsync(hexValue)).Time;
+            lastMinuteSecondBefore : ( await _planeHistoryRepository.GetPlanePointer(hexValue))?.Time ?? 0;
 
         return new()
         {
@@ -75,9 +71,15 @@ public class AccessDomainService : IAccessDomainService
 
     private async Task<PlaneDataRecordLink> RaceCase(string hexValue, long lastMinuteSecond)
     {
-        long lastSeen = (await _lastSeenPointerRepository.GetLastSeenRecordAsync(hexValue)).Time;
 
-        if (lastSeen == lastMinuteSecond) // We already have the info
+        var lastSeenPlaneTime = (await _planeHistoryRepository.GetPlanePointer(hexValue))?.Time ?? 0;
+
+        if( lastSeenPlaneTime is 0)
+        {
+            return new();
+        }
+
+        if (lastSeenPlaneTime == lastMinuteSecond) // We already have the info
         {
             return await _planeHistoryRepository.GetPlaneHistory(hexValue,lastMinuteSecond);
         }
@@ -90,7 +92,7 @@ public class AccessDomainService : IAccessDomainService
         return new()
         {
             Planes = await _planeCacheRepository.GetPlaneMinute(hexValue, lastMinuteSecond), 
-            PreviousLink = planesFromLastMinute.Any(_ => _ == hexValue) ? lastMinuteSecondBefore : lastSeen
+            PreviousLink = planesFromLastMinute.Any(_ => _ == hexValue) ? lastMinuteSecondBefore : lastSeenPlaneTime
         };
     }
 }
