@@ -24,5 +24,6 @@
     <ProjectReference Include="..\Infrastructure.Redis\Infrastructure.Redis.csproj" />
     <ProjectReference Include="..\Infrastructure.Couchbase\Infrastructure.Couchbase.csproj" />
     <ProjectReference Include="..\Infrastructure.RepositoryCore\Infrastructure.RepositoryCore.csproj" />
+    <ProjectReference Include="..\Infrastructure.MongoDB\Infrastructure.MongoDB.csproj" />
   </ItemGroup>
 </Project>

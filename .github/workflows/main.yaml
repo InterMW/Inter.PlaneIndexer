@@ -30,7 +30,6 @@ jobs:
         RABBIT_USER : ${{secrets.RABBIT_USER}}
         RABBIT_PASSWORD : ${{secrets.RABBIT_PASSWORD}}
         ONPREM_REDIS : ${{secrets.ONPREM_REDIS}}
-        COUCHBASE_PASSWORD : ${{secrets.COUCHBASE_PASSWORD}}
      - 
       name: Replace Appsettings
       run: cp ${{env.REPLACESETTINGS}} ${{env.APPSETTINGS}}
@@ -64,7 +63,7 @@ jobs:
               ${{secrets.DOCKER_HOST}}/${{env.TAG}}
   deploy:
     needs: build-publish
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     env:
       TAG: interplaneindexer
     steps:

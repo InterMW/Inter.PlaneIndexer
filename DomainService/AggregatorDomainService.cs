@@ -12,17 +12,14 @@ public interface IAggregaterDomainService
 public class AggregaterDomainService : IAggregaterDomainService
 {
     private readonly IPlaneHistoryCacheRepository _planeHistoryCache;
-    private readonly ILastSeenPointerRepository _lastSeenRepository;
     private readonly IPlaneHistoryRepository _planeHistoryRepository;
     
     public AggregaterDomainService(
         IPlaneHistoryCacheRepository planeHistoryCacheRepository,
-        ILastSeenPointerRepository lastSeenPointerRepository,
         IPlaneHistoryRepository planeHistoryRepository
     )
     {
         _planeHistoryCache = planeHistoryCacheRepository;
-        _lastSeenRepository = lastSeenPointerRepository;
         _planeHistoryRepository = planeHistoryRepository;
     }
 
@@ -35,7 +32,7 @@ public class AggregaterDomainService : IAggregaterDomainService
 
     private async Task CompilePlane(string hexValue, long offsetTime)
     {
-        var previousLink = await _lastSeenRepository.GetLastSeenRecordAsync(hexValue);
+        var previousLink = await _planeHistoryRepository.GetPlanePointer(hexValue) ?? new();
 
         var planes = await _planeHistoryCache.GetPlaneMinute(hexValue, offsetTime);
 
@@ -45,12 +42,14 @@ public class AggregaterDomainService : IAggregaterDomainService
         {
             var data = new PlaneDataRecordLink()
             {
+                Time = offsetTime,
+                Hex = hexValue,
                 PreviousLink = previousLink.Time,
                 Planes = filteredPlanes
             };
 
-            await _planeHistoryRepository.StorePlaneHistory(hexValue,offsetTime, data);
-            await _lastSeenRepository.SetLastSeenRecordAsync(filteredPlanes.Last());
+            await _planeHistoryRepository.StorePlaneHistory(data);
+            await _planeHistoryRepository.UpdatePlanePointer(filteredPlanes.Last());
         }
     }
 
