@@ -48,6 +48,13 @@ public class LongTermPlaneHistoryRepository(PlaneClient client) : IPlaneHistoryR
     {
         await _standardCollection.InsertOneAsync(new() {Hex = model.Hex, Time = model.Time, Planes = model.Planes} );
     }
+
+    public async Task CleanupOldPlaneLinks(long minuteInSeconds)
+    {
+        await _standardCollection.DeleteManyAsync(
+                Builders<PlaneDataRecordLinkModel>.Filter.Lte("Time", minuteInSeconds)
+                );
+    }
 }
 
 public class PlaneDataRecordLinkModel
