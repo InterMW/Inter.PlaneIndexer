@@ -46,7 +46,7 @@ public class LongTermPlaneHistoryRepository(PlaneClient client) : IPlaneHistoryR
 
     public async Task StorePlaneHistory(PlaneDataRecordLink model) 
     {
-        await _standardCollection.InsertOneAsync(new() {Hex = model.Hex, Time = model.Time, Planes = model.Planes} );
+        await _standardCollection.InsertOneAsync(new() {Hex = model.Hex, Time = model.Time, Planes = model.Planes, PreviousLink = model.PreviousLink } );
     }
 
     public async Task CleanupOldPlaneLinks(long minuteInSeconds)
