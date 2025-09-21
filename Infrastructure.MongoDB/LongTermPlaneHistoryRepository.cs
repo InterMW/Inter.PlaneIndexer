@@ -23,7 +23,7 @@ public class LongTermPlaneHistoryRepository(PlaneClient client) : IPlaneHistoryR
 
     public async Task UpdatePlanePointer(PlaneMinimal plane) 
     {
-        var currentPointer = await _pointerCollection.FindAsync(Builders<PlaneMinimalModel>.Filter.Eq("HexValue",plane.HexValue));
+        var currentPointer = await _pointerCollection.FindAsync(Builders<PlaneMinimalModel>.Filter.Eq("hexValue",plane.HexValue));
 
         if (await currentPointer.FirstOrDefaultAsync() is null)
         {
