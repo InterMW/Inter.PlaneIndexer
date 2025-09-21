@@ -32,7 +32,7 @@ public class LongTermPlaneHistoryRepository(PlaneClient client) : IPlaneHistoryR
         else
         {
             await _pointerCollection.ReplaceOneAsync(
-                Builders<PlaneMinimalModel>.Filter.Eq("HexValue",plane.HexValue),
+                Builders<PlaneMinimalModel>.Filter.Eq("hexValue",plane.HexValue),
                 plane.ToModel()
                 );
         }
@@ -52,7 +52,7 @@ public class LongTermPlaneHistoryRepository(PlaneClient client) : IPlaneHistoryR
     public async Task CleanupOldPlaneLinks(long minuteInSeconds)
     {
         await _standardCollection.DeleteManyAsync(
-                Builders<PlaneDataRecordLinkModel>.Filter.Lte("Time", minuteInSeconds)
+                Builders<PlaneDataRecordLinkModel>.Filter.Lte("time", minuteInSeconds)
                 );
     }
 }
