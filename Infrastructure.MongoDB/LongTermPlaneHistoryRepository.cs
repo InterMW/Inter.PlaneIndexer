@@ -40,7 +40,9 @@ public class LongTermPlaneHistoryRepository(PlaneClient client) : IPlaneHistoryR
 
     public async Task<PlaneDataRecordLink> GetPlaneHistory(string hexValue, long minuteInSeconds) 
     {
-        var j = await _standardCollection.Find(link => link.Hex == hexValue && link.Time == minuteInSeconds).FirstOrDefaultAsync();
+        // var j = await _standardCollection.Find(link => link.Hex == hexValue && link.Time == minuteInSeconds).FirstOrDefaultAsync();
+        var j = await _standardCollection.Find(link => link.Hex == hexValue.ToUpper()  && link.Time == minuteInSeconds).FirstOrDefaultAsync();
+
         return new(){Planes = j.Planes, Time = j.Time, Hex = j.Hex, PreviousLink = j.PreviousLink};
     }
 
