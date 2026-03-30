@@ -21,7 +21,8 @@ public class IngressDomainService : IIngressDomainService
     {
         var lastMin = now.ToLastMinInSec();
 
-        return Task.WhenAll(planes.Select(_ => _historyCache.RecordPlane(ToMinimal(_, now), lastMin)));
+        return Task.WhenAll(planes.Where(_ => ((_.Latitude ?? 0) != 0 )
+                    &&( (_.Longitude ?? 0) != 0)).Select(_ => _historyCache.RecordPlane(ToMinimal(_, now), lastMin)));
     } 
     
     private static PlaneMinimal ToMinimal(Plane plane, long now)
