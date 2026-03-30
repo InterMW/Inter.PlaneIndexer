@@ -48,7 +48,6 @@ public class AggregaterDomainService : IAggregaterDomainService
                 PreviousLink = previousLink.Time,
                 Planes = filteredPlanes
             };
-
             await _planeHistoryRepository.StorePlaneHistory(data);
             await _planeHistoryRepository.UpdatePlanePointer(filteredPlanes.Last());
         }

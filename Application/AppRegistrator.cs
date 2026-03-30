@@ -18,8 +18,9 @@ public class AppRegistrator : Registrator
 {
     public override void RegisterServices(IServiceCollection services)
     {
+        var isDev = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
         RabbitModule.RegisterMicroConsumer<IngressProcessor, CompletedPlaneFrameMessage>(services, false);
-        RabbitModule.RegisterMicroConsumer<IndexProcessor, TickMessage>(services,true);
+        RabbitModule.RegisterMicroConsumer<IndexProcessor, TickMessage>(services,!isDev);
 
         services.AddTransient<IIngressDomainService, IngressDomainService>();
         services.AddTransient<IAggregaterDomainService, AggregaterDomainService>();

@@ -50,6 +50,7 @@ public class AccessDomainService : IAccessDomainService
             return await RaceCase(hexValue,lastMinuteSecond - 60);
         }
 
+        var last = time.ToLastMinInSec();
         return await _planeHistoryRepository.GetPlaneHistory(hexValue,time.ToLastMinInSec());
     }
     //First case is early, we get the plane data and find out from redis 
@@ -61,6 +62,7 @@ public class AccessDomainService : IAccessDomainService
         var planesImmediatelyBefore = planesFromLastMinute.Any(_ => _ == hexValue);
         long lastSeen = planesImmediatelyBefore ?
             lastMinuteSecondBefore : ( await _planeHistoryRepository.GetPlanePointer(hexValue))?.Time ?? 0;
+
 
         return new()
         {

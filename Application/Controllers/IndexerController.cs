@@ -22,6 +22,16 @@ public class IndexerController
     
     [HttpGet]
     [Route("history")]
-    public Task<PlaneDataRecordLink> GetHistoryForPlane([FromQuery] string hexValue, [FromQuery] long? time) =>
-        _service.RetrievePlaneHistory(hexValue.ToLower(),time ?? (long)(_clock.GetUtcNow() - DateTime.UnixEpoch).TotalSeconds);
+    public async Task<PlaneDataRecordLink> GetHistoryForPlane([FromQuery] string hexValue, [FromQuery] long? time)
+    {
+        var tim = time ?? ExtractTimestamp(_clock.GetUtcNow());
+        var result = await _service.RetrievePlaneHistory(hexValue.ToLower(), tim);//time ?? (long)(_clock.GetUtcNow() - DateTime.UnixEpoch).TotalSeconds);
+
+        return result;
+    }
+    
+    private long ExtractTimestamp(DateTime time) => 
+        (long) Math.Floor(
+            time.Subtract(DateTime.UnixEpoch).TotalSeconds
+            );
 }
