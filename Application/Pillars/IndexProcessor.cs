@@ -20,7 +20,10 @@ public class IndexProcessor : IStandardConsumer
     }
     public async Task ConsumeMessageAsync(Message message, CancellationToken ct)
     {
-        var time = ExtractTimestamp(message.GetTimestamp());
+        // var time = ExtractTimestamp(message.GetTimestamp());
+        var now = DateTime.UtcNow;
+        var time = ExtractTimestamp(DateTime.UtcNow.AddSeconds(-1 * now.Second));
+
         
         _logger.LogInformation("Trying");
         try

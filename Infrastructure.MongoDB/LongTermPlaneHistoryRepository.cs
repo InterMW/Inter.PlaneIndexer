@@ -16,8 +16,9 @@ public class LongTermPlaneHistoryRepository(PlaneClient client) : IPlaneHistoryR
 
     public async Task<PlaneMinimal> GetPlanePointer(string hexValue)
     {
-        var result = await _pointerCollection.FindAsync(minimal => minimal.HexValue == hexValue);
+        var result = await _pointerCollection.FindAsync(minimal => minimal.HexValue == hexValue.ToUpper());
         var model =await result.FirstOrDefaultAsync();
+
         return model?.ToDomain() ?? new() {HexValue = hexValue, Time = 0};
     }
 
@@ -32,7 +33,7 @@ public class LongTermPlaneHistoryRepository(PlaneClient client) : IPlaneHistoryR
         else
         {
             await _pointerCollection.ReplaceOneAsync(
-                Builders<PlaneMinimalModel>.Filter.Eq("hexValue",plane.HexValue),
+                Builders<PlaneMinimalModel>.Filter.Eq("hexValue",plane.HexValue.ToUpper()),
                 plane.ToModel()
                 );
         }
@@ -40,15 +41,21 @@ public class LongTermPlaneHistoryRepository(PlaneClient client) : IPlaneHistoryR
 
     public async Task<PlaneDataRecordLink> GetPlaneHistory(string hexValue, long minuteInSeconds) 
     {
+
         // var j = await _standardCollection.Find(link => link.Hex == hexValue && link.Time == minuteInSeconds).FirstOrDefaultAsync();
-        var j = await _standardCollection.Find(link => link.Hex == hexValue.ToUpper()  && link.Time == minuteInSeconds).FirstOrDefaultAsync();
+        var j = await _standardCollection.Find(link => link.Hex == hexValue.ToUpper()  
+               && link.Time == minuteInSeconds
+                ).FirstOrDefaultAsync();
+
+        j ??= new PlaneDataRecordLinkModel();
+
 
         return new(){Planes = j.Planes, Time = j.Time, Hex = j.Hex, PreviousLink = j.PreviousLink};
     }
 
     public async Task StorePlaneHistory(PlaneDataRecordLink model) 
     {
-        await _standardCollection.InsertOneAsync(new() {Hex = model.Hex, Time = model.Time, Planes = model.Planes, PreviousLink = model.PreviousLink } );
+        await _standardCollection.InsertOneAsync(new() {Hex = model.Hex.ToUpper(), Time = model.Time, Planes = model.Planes, PreviousLink = model.PreviousLink } );
     }
 
     public async Task CleanupOldPlaneLinks(long minuteInSeconds)
@@ -84,7 +91,7 @@ public static class PlaneMinimalModelMapper
     public static PlaneMinimalModel ToModel(this PlaneMinimal source) => new ()
     {
         Time = source.Time,
-        HexValue = source.HexValue,
+        HexValue = source.HexValue.ToUpper(),
         Latitude = source.Latitude,
         Longitude = source.Longitude,
         Altitude = source.Altitude
