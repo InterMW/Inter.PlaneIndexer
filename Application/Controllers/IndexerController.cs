@@ -25,7 +25,7 @@ public class IndexerController
     public async Task<PlaneDataRecordLink> GetHistoryForPlane([FromQuery] string hexValue, [FromQuery] long? time)
     {
         var tim = time ?? ExtractTimestamp(_clock.GetUtcNow());
-        var result = await _service.RetrievePlaneHistory(hexValue.ToLower(), tim);//time ?? (long)(_clock.GetUtcNow() - DateTime.UnixEpoch).TotalSeconds);
+        var result = await _service.RetrievePlaneHistory(hexValue.ToUpper(), tim);//time ?? (long)(_clock.GetUtcNow() - DateTime.UnixEpoch).TotalSeconds);
 
         return result;
     }

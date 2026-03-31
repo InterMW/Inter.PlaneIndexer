@@ -50,6 +50,7 @@ public class AggregaterDomainService : IAggregaterDomainService
             };
             await _planeHistoryRepository.StorePlaneHistory(data);
             await _planeHistoryRepository.UpdatePlanePointer(filteredPlanes.Last());
+            // Console.WriteLine($"{hexValue} recorded for {offsetTime} with lastseen at {filteredPlanes.Last().Time}");
         }
     }
 
