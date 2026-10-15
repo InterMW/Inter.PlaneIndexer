@@ -70,7 +70,7 @@ jobs:
      - name: SSH Command
        uses: nekiro/ssh-job@v1.0.5
        with:
-        command:  docker pull ${{secrets.DOCKER_HOST}}/${{env.TAG}}; docker stop ${{env.TAG}}; docker rm ${{env.TAG}}; docker run --name ${{env.TAG}} --restart=unless-stopped --net inter_network -m=500m --dns=10.0.0.33 -d ${{secrets.DOCKER_HOST}}/${{env.TAG}}; 
+        command:  cd Deployment && bash DeployScript.sh interplaneindexer
         host: ${{secrets.HOST}}
         user: ${{secrets.CENTURION_USERNAME}}
         password: ${{secrets.CENTURION_PASSWORD}}
